@@ -17,7 +17,7 @@ var offers = [
 
 var getRandomNumber = function (min, max) {
   return Math.random() * (max - min) + min;
-}
+};
 
 var makeNotice = function (i) {
   var notice = {};
