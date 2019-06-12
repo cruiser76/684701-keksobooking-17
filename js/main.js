@@ -6,7 +6,7 @@ var PIN_HEIGHT = 70;
 
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
-var currentWidth = map.offsetWidth;
+var WINDOW_WIDTH = map.offsetWidth;
 
 var offers = [
   'palace',
@@ -15,6 +15,10 @@ var offers = [
   'bungalo'
 ];
 
+var getRandomNumber = function (min, max) {
+  return Math.random() * (max - min) + min;
+}
+
 var makeNotice = function (i) {
   var notice = {};
   notice.author = {
@@ -22,12 +26,12 @@ var makeNotice = function (i) {
   };
 
   notice.offer = {
-    type: offers[Math.floor(Math.random() * offers.length)]
+    type: offers[Math.floor(getRandomNumber(0, offers.length))]
   };
 
   notice.location = {
-    x: Math.round(Math.random() * currentWidth),
-    y: Math.round(Math.random() * (MAX_WINDOW_HEIGHT - MIN_WINDOW_HEIGHT) + MIN_WINDOW_HEIGHT)
+    x: Math.round(getRandomNumber(0, WINDOW_WIDTH)),
+    y: Math.round(getRandomNumber(MIN_WINDOW_HEIGHT, MAX_WINDOW_HEIGHT))
   };
 
   return notice;
