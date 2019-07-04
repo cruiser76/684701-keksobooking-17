@@ -3,6 +3,7 @@ var MIN_WINDOW_HEIGHT = 130;
 var MAX_WINDOW_HEIGHT = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
+var NOTICES_NUMBER = 8;
 
 var map = document.querySelector('.map');
 var mainPin = map.querySelector('.map__pin--main');
@@ -54,7 +55,7 @@ var makeNotices = function (count) {
   return noticesList;
 };
 
-var mockNotices = makeNotices(8);
+var mockNotices = makeNotices(NOTICES_NUMBER);
 
 var renderPin = function (notice) {
   var pin = pinTemplate.cloneNode(true);
@@ -74,16 +75,26 @@ var changeDisable = function (item, status) {
   }
 };
 
-changeDisable(fieldsets, true);
-changeDisable(selects, true);
+var deactivatePage = function () {
+  changeDisable(fieldsets, true);
+  changeDisable(selects, true);
+  map.classList.add('map--faded');
+  noticeForm.classList.add('ad-form--disabled');
+};
 
-address.value = '' + parseInt(mainPin.style.left, 10) + ',' + parseInt(mainPin.style.top, 10);
-mainPin.addEventListener('click', function () {
+deactivatePage();
+
+var activatePage = function () {
   changeDisable(fieldsets, false);
   changeDisable(selects, false);
   map.classList.remove('map--faded');
   noticeForm.classList.remove('ad-form--disabled');
   mockNotices.forEach(renderPin);
   pinsList.appendChild(fragment);
-});
+};
 
+address.value = '' + parseInt(mainPin.style.left, 10) + ',' + parseInt(mainPin.style.top, 10);
+
+mainPin.addEventListener('click', function () {
+  activatePage();
+});
