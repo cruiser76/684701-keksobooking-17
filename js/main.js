@@ -1,5 +1,4 @@
 'use strict';
-
 var MIN_WINDOW_HEIGHT = 130;
 var MAX_WINDOW_HEIGHT = 630;
 var PIN_WIDTH = 50;
@@ -11,6 +10,7 @@ var BUNGALO_MIN_PRICE = 0;
 var HOUSE_MIN_PRICE = 5000;
 var FLAT_MIN_PRICE = 1000;
 var PALACE_MIN_PRICE = 10000;
+var isActive = false;
 
 var map = document.querySelector('.map');
 var mainPin = map.querySelector('.map__pin--main');
@@ -104,6 +104,7 @@ var changeDisable = function (item, status) {
 };
 
 var deactivatePage = function () {
+  isActive = false;
   changeDisable(fieldsets, true);
   changeDisable(selects, true);
   map.classList.add('map--faded');
@@ -113,6 +114,7 @@ var deactivatePage = function () {
 deactivatePage();
 
 var activatePage = function () {
+  isActive = true;
   changeDisable(fieldsets, false);
   changeDisable(selects, false);
   map.classList.remove('map--faded');
@@ -123,12 +125,11 @@ var activatePage = function () {
 
 address.value = '' + parseInt(mainPin.style.left, 10) + ',' + parseInt(mainPin.style.top, 10);
 
-// mainPin.addEventListener('click', function () {
-//   activatePage();
-// });
-
 mainPin.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
+  if (!isActive) {
+    activatePage();
+  }
   var startCoords = {
     x: evt.clientX,
     y: evt.clientY
@@ -136,7 +137,7 @@ mainPin.addEventListener('mousedown', function (evt) {
 
   var onMouseMove = function (moveEvt) {
     moveEvt.preventDefault();
-    activatePage();
+
     var shift = {
       x: startCoords.x - moveEvt.clientX,
       y: startCoords.y - moveEvt.clientY
