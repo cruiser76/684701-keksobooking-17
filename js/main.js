@@ -3,11 +3,14 @@ var MIN_WINDOW_HEIGHT = 130;
 var MAX_WINDOW_HEIGHT = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
+var MAIN_PIN_WIDTH = 64;
+var MAIN_PIN_HEIGHT = 75;
 var NOTICES_NUMBER = 8;
 var BUNGALO_MIN_PRICE = 0;
 var HOUSE_MIN_PRICE = 5000;
 var FLAT_MIN_PRICE = 1000;
 var PALACE_MIN_PRICE = 10000;
+var isActive = false;
 
 var map = document.querySelector('.map');
 var mainPin = map.querySelector('.map__pin--main');
@@ -19,7 +22,7 @@ var pinTemplate = document.querySelector('#pin')
 
 var fragment = document.createDocumentFragment();
 
-var WINDOW_WIDTH = map.offsetWidth;
+var WINDOW_WIDTH = map.clientWidth;
 var noticeForm = document.querySelector('.ad-form');
 var houseTypeField = noticeForm.querySelector('#type');
 var priceField = noticeForm.querySelector('#price');
@@ -101,6 +104,7 @@ var changeDisable = function (item, status) {
 };
 
 var deactivatePage = function () {
+  isActive = false;
   changeDisable(fieldsets, true);
   changeDisable(selects, true);
   map.classList.add('map--faded');
@@ -110,6 +114,7 @@ var deactivatePage = function () {
 deactivatePage();
 
 var activatePage = function () {
+  isActive = true;
   changeDisable(fieldsets, false);
   changeDisable(selects, false);
   map.classList.remove('map--faded');
@@ -120,8 +125,46 @@ var activatePage = function () {
 
 address.value = '' + parseInt(mainPin.style.left, 10) + ',' + parseInt(mainPin.style.top, 10);
 
-mainPin.addEventListener('click', function () {
-  activatePage();
+mainPin.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+  if (!isActive) {
+    activatePage();
+  }
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    if (mainPin.offsetTop - shift.y >= MIN_WINDOW_HEIGHT && mainPin.offsetTop - shift.y < MAX_WINDOW_HEIGHT) {
+      mainPin.style.top = (mainPin.offsetTop - shift.y) + 'px';
+    }
+    if (mainPin.offsetLeft - shift.x >= 0 && mainPin.offsetLeft - shift.x <= (WINDOW_WIDTH - MAIN_PIN_WIDTH)) {
+      mainPin.style.left = (mainPin.offsetLeft - shift.x) + 'px';
+    }
+    address.value = '' + (parseInt(mainPin.style.left, 10) + MAIN_PIN_WIDTH / 2) + ',' + (parseInt(mainPin.style.top, 10) + MAIN_PIN_HEIGHT);
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
 });
 
 changeMinPrice(houseTypeField.value);
