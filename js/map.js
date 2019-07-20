@@ -1,19 +1,17 @@
 'use strict';
 
 (function () {
-  var NOTICES_NUMBER = 8;
   var map = document.querySelector('.map');
   var noticeForm = document.querySelector('.ad-form');
   var mainPin = map.querySelector('.map__pin--main');
   var fieldsets = document.querySelectorAll('fieldset');
   var selects = document.querySelectorAll('select');
   var pinsList = document.querySelector('.map__pins');
-
+  var fragment = document.createDocumentFragment();
   var isActive = false;
-  var mockNotices = window.data.noticesList(NOTICES_NUMBER);
   var address = document.querySelector('#address');
 
-  var fragment = document.createDocumentFragment();
+
   var changeDisable = function (item, status) {
     for (var i = 0; i < item.length; i += 1) {
       item[i].disabled = status;
@@ -31,14 +29,12 @@
   deactivatePage();
 
   var activatePage = function () {
+
     isActive = true;
     changeDisable(fieldsets, false);
     changeDisable(selects, false);
     map.classList.remove('map--faded');
     noticeForm.classList.remove('ad-form--disabled');
-    mockNotices.forEach(function (notice) {
-      fragment.appendChild(window.pin.renderPin(notice));
-    });
     pinsList.appendChild(fragment);
   };
 
@@ -85,4 +81,22 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
+
+  var onDataLoad = function (notices) {
+    notices.forEach(function (notice) {
+      fragment.appendChild(window.pin.renderPin(notice));
+    });
+  };
+
+  var onErrorAppearance = function (errorMessage) {
+    var errorTemplate = document.querySelector('#error')
+      .content
+      .querySelector('.error');
+    var errorText = errorTemplate.querySelector('.error__message');
+    errorText.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', errorTemplate);
+  };
+
+  window.backend.load(onDataLoad, onErrorAppearance);
+
 })();

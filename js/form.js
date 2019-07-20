@@ -11,6 +11,8 @@
   var priceField = noticeForm.querySelector('#price');
   var timein = noticeForm.querySelector('#timein');
   var timeout = noticeForm.querySelector('#timeout');
+  var capacity = noticeForm.querySelector('#capacity');
+  var roomNumber = noticeForm.querySelector('#room_number');
 
   var changeMinPrice = function (houseType) {
     if (houseType === 'palace') {
@@ -38,4 +40,25 @@
   timeout.addEventListener('change', function () {
     timein.value = timeout.value;
   });
+
+  var changeCapacityAvailable = function () {
+    for (var i = 0; i < capacity.options.length; i += 1) {
+      capacity.options[i].disabled = true;
+      if (parseInt(capacity.options[i].value, 10) <= parseInt(roomNumber.value, 10) && capacity.options[i].value !== '0' && roomNumber.value !== '100') {
+        capacity.options[i].disabled = false;
+        capacity.options[2].selected = true;
+      } else if (roomNumber.value === '100' && capacity.options[i].value === '0') {
+        capacity.options[i].disabled = false;
+        capacity.options[i].selected = true;
+      }
+    }
+  };
+
+  changeCapacityAvailable();
+
+  var onRoomNumberChange = function () {
+    changeCapacityAvailable();
+  };
+
+  roomNumber.addEventListener('change', onRoomNumberChange);
 })();
