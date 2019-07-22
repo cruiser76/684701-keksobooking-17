@@ -8,13 +8,11 @@
   var MAX_WINDOW_HEIGHT = 630;
 
   var MAIN_PIN_WIDTH = 64;
-  var MAIN_PIN_HEIGHT = 75;
-
-  var map = document.querySelector('.map');
-  var WINDOW_WIDTH = map.clientWidth;
+  var MAIN_PIN_HEIGHT = 82;
+  var WINDOW_WIDTH = 1200;
 
   var getRandomNumber = function (min, max) {
-    return Math.random() * (max - min) + min;
+    return (Math.random() * (max - min) + min);
   };
 
   var offers = [
@@ -23,7 +21,7 @@
     'house',
     'bungalo'
   ];
-
+  // временно
   var makeNotices = function (count) {
     var noticesList = [];
     for (var i = 0; i < count; i += 1) {
@@ -45,10 +43,8 @@
     }
     return noticesList;
   };
-
-
   window.data = {
-    noticesList: makeNotices,
+    noticesList: makeNotices, // временно
     PIN_WIDTH: PIN_WIDTH,
     PIN_HEIGHT: PIN_HEIGHT,
     MIN_WINDOW_HEIGHT: MIN_WINDOW_HEIGHT,
@@ -57,4 +53,5 @@
     MAIN_PIN_WIDTH: MAIN_PIN_WIDTH,
     MAIN_PIN_HEIGHT: MAIN_PIN_HEIGHT
   };
+
 })();
