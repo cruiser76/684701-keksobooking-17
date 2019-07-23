@@ -32,8 +32,13 @@
       };
 
       notice.offer = {
-        type: offers[Math.floor(getRandomNumber(0, offers.length))]
+        type: offers[Math.floor(getRandomNumber(0, offers.length))],
+        price: Math.round(getRandomNumber(1, 100000)),
+        rooms: Math.round(getRandomNumber(1, 3)),
+        guests: Math.round(getRandomNumber(0, 2)),
+        features: ['dishwasher', 'parking', 'washer', 'elevator', 'conditioner']
       };
+
 
       notice.location = {
         x: Math.round(getRandomNumber(0, WINDOW_WIDTH - PIN_WIDTH)),
