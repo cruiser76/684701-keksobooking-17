@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  // var NOTICES_NUMBER = 8;//временно
+  // var NOTICES_NUMBER = 20;//временно
   // var mockNotices = window.data.noticesList(NOTICES_NUMBER);//временно
   var noticesList;
   var map = document.querySelector('.map');
@@ -11,17 +11,43 @@
   var selects = document.querySelectorAll('select');
   var pinsList = document.querySelector('.map__pins');
 
-
   var isActive = false;
   var address = document.querySelector('#address');
+
   var filters = document.querySelector('.map__filters');
+  var filtersList = filters.querySelectorAll('.map__filter');
   var housingType = filters.querySelector('#housing-type');
+  var housingPrice = filters.querySelector('#housing-price');
+  var housingRooms = filters.querySelector('#housing-rooms');
+  var housingGuests = filters.querySelector('#housing-guests');
+  var checkBoxList = filters.querySelectorAll('.map__checkbox');
 
 
   var changeDisable = function (item, status) {
     for (var i = 0; i < item.length; i += 1) {
       item[i].disabled = status;
     }
+  };
+
+  var onDataLoad = function (notices) {
+    noticesList = notices;
+    notices.slice(0, 5).forEach(function (notice) {
+      var fragment = document.createDocumentFragment();
+      fragment.appendChild(window.pin.renderPin(notice));
+      pinsList.appendChild(fragment);
+      var cardFragment = document.createDocumentFragment();
+      cardFragment.appendChild(window.card.renderCard(noticesList[0]));
+      map.insertBefore(cardFragment, document.querySelector('.map__filters-container'));
+    });
+  };
+
+  var onErrorAppearance = function (errorMessage) {
+    var errorTemplate = document.querySelector('#error')
+      .content
+      .querySelector('.error');
+    var errorText = errorTemplate.querySelector('.error__message');
+    errorText.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', errorTemplate);
   };
 
   var deactivatePage = function () {
@@ -43,10 +69,12 @@
     noticeForm.classList.remove('ad-form--disabled');
 
     // временно
+    // var fragment = document.createDocumentFragment();
     // mockNotices.slice(0,5).forEach(function (notice) {
     //   fragment.appendChild(window.pin.renderPin(notice));
     // });
     // pinsList.appendChild(fragment);
+
   };
 
   address.value = '' + parseInt(mainPin.style.left, 10) + ',' + parseInt(mainPin.style.top, 10);
@@ -93,48 +121,101 @@
     document.addEventListener('mouseup', onMouseUp);
   });
 
-  var onDataLoad = function (notices) {
-    noticesList = notices;
-    notices.slice(0, 5).forEach(function (notice) {
-      var fragment = document.createDocumentFragment();
-      fragment.appendChild(window.pin.renderPin(notice));
-      pinsList.appendChild(fragment);
+  // получим число фильтров объявления, значения которых совпадает с фильтрами формы
+  var getNumberNoticeFilter = function (notice) {
+    var filtersAmount = 0;
+
+    // совпадает тип жилья
+    if (notice.offer.type === housingType.value) {
+      filtersAmount += 1;
+    }
+
+    // совпадает диапазон цены
+    if (notice.offer.price < 10000 && housingPrice.value === 'low') {
+      filtersAmount += 1;
+    } else if (notice.offer.price >= 50000 && housingPrice.value === 'high') {
+      filtersAmount += 1;
+    } else if (notice.offer.price >= 10000 && notice.offer.price < 50000 && housingPrice.value === 'middle') {
+      filtersAmount += 1;
+    }
+
+    // совпадает число комнат
+    if (notice.offer.rooms === +housingRooms.value) {
+      filtersAmount += 1;
+    }
+
+    // совпадает число гостей
+    if (notice.offer.guests === +housingGuests.value) {
+      filtersAmount += 1;
+    }
+
+    // есть совпадающие чекбоксы
+    notice.offer.features.forEach(function (fitureEl) {
+      // создаем массив
+      var checkboxArray = Array.from(checkBoxList);
+      // выбираем значения нажатых чекбоксов на форме и создаем из них массив
+      var mapArr = checkboxArray.map(function (checkboxEl) {
+        if (checkboxEl.checked) {
+          return checkboxEl.value;
+        }
+        return false;
+      });
+      // проверяем для списка фич из объявлений есть ли нажатые чекбоксы на форме
+      if (mapArr.indexOf(fitureEl) >= 0) {
+        filtersAmount += 1;
+      }
     });
+
+    return filtersAmount;
   };
 
-  var onErrorAppearance = function (errorMessage) {
-    var errorTemplate = document.querySelector('#error')
-      .content
-      .querySelector('.error');
-    var errorText = errorTemplate.querySelector('.error__message');
-    errorText.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', errorTemplate);
+  // число установленных фильтров на форме
+  var getAmountFormFilters = function () {
+    var filtersArray = Array.from(filtersList);
+    var checkboxArray = Array.from(checkBoxList);
+
+    var totalFilters = filtersArray.reduce(function (acc, el) {
+      acc += (el.value === 'any' ? 0 : 1);
+      return acc;
+    }, 0) + checkboxArray.reduce(function (acc, el) {
+      acc += el.checked ? 1 : 0;
+      return acc;
+    }, 0);
+
+    return totalFilters;
   };
 
-  var filterChange = function () {
+  var onFilterChange = function () {
     var pins = pinsList.querySelectorAll('.map__pin');
     var fragment = document.createDocumentFragment();
+
     pins.forEach(function (el) {
       if (!el.classList.contains('map__pin--main')) {
         el.remove();
       }
     });
+    var amountFormFilters = getAmountFormFilters();
 
-    noticesList.filter(function (filterEl) {
-      if (housingType.value === 'any') {
+    // выбираем объявления которые совпадают по количеству фильтров с количеством фильтров на форме
+    var filtered = noticesList.filter(function (notice) {
+      if (amountFormFilters === getNumberNoticeFilter(notice)) {
         return true;
       }
-      return filterEl.offer.type === housingType.value;
-    }).slice(0, 5).forEach(function (notice) {
+      return false;
+    });
+
+    filtered.slice(0, 5).forEach(function (notice) {
       fragment.appendChild(window.pin.renderPin(notice));
     });
 
     pinsList.appendChild(fragment);
   };
 
-  var onHousingTypeChange = function () {
-    filterChange();
-  };
 
-  housingType.addEventListener('change', onHousingTypeChange);
+  filtersList.forEach(function () {
+    addEventListener('change', onFilterChange);
+  });
+  checkBoxList.forEach(function () {
+    addEventListener('change', onFilterChange);
+  });
 })();
