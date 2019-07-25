@@ -35,8 +35,10 @@
         type: offers[Math.floor(getRandomNumber(0, offers.length))],
         price: Math.round(getRandomNumber(1, 100000)),
         rooms: Math.round(getRandomNumber(1, 3)),
-        guests: Math.round(getRandomNumber(0, 2)),
-        features: ['dishwasher', 'parking', 'washer', 'elevator', 'conditioner']
+        guests: Math.round(getRandomNumber(1, 3)),
+        features: ['dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
+        title: 'Тестовая надпись',
+        photos: ['']
       };
 
 

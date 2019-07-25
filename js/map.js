@@ -1,8 +1,8 @@
 'use strict';
 
 (function () {
-  // var NOTICES_NUMBER = 20;//временно
-  // var mockNotices = window.data.noticesList(NOTICES_NUMBER);//временно
+  var NOTICES_NUMBER = 5;
+  // var mockNotices = window.data.noticesList(NOTICES_NUMBER);// временно
   var noticesList;
   var map = document.querySelector('.map');
   var noticeForm = document.querySelector('.ad-form');
@@ -22,6 +22,10 @@
   var housingGuests = filters.querySelector('#housing-guests');
   var checkBoxList = filters.querySelectorAll('.map__checkbox');
 
+  var Price = {
+    LOW: 10000,
+    HIGH: 50000
+  };
 
   var changeDisable = function (item, status) {
     for (var i = 0; i < item.length; i += 1) {
@@ -29,16 +33,22 @@
     }
   };
 
+  var placePins = function (pins) {
+    var fragment = document.createDocumentFragment();
+    pins.slice(0, NOTICES_NUMBER).forEach(function (notice) {
+      fragment.appendChild(window.pin.renderPin(notice));
+    });
+    pinsList.appendChild(fragment);
+  };
+
   var onDataLoad = function (notices) {
     noticesList = notices;
-    notices.slice(0, 5).forEach(function (notice) {
+    notices.slice(0, NOTICES_NUMBER).forEach(function (notice) {
       var fragment = document.createDocumentFragment();
       fragment.appendChild(window.pin.renderPin(notice));
       pinsList.appendChild(fragment);
-      var cardFragment = document.createDocumentFragment();
-      cardFragment.appendChild(window.card.renderCard(noticesList[0]));
-      map.insertBefore(cardFragment, document.querySelector('.map__filters-container'));
     });
+    window.card.renderCard(notices[0]);
   };
 
   var onErrorAppearance = function (errorMessage) {
@@ -69,12 +79,9 @@
     noticeForm.classList.remove('ad-form--disabled');
 
     // временно
-    // var fragment = document.createDocumentFragment();
-    // mockNotices.slice(0,5).forEach(function (notice) {
-    //   fragment.appendChild(window.pin.renderPin(notice));
-    // });
-    // pinsList.appendChild(fragment);
+    // placePins(mockNotices);
 
+    // window.card.renderCard(mockNotices[0]);
   };
 
   address.value = '' + parseInt(mainPin.style.left, 10) + ',' + parseInt(mainPin.style.top, 10);
@@ -131,11 +138,11 @@
     }
 
     // совпадает диапазон цены
-    if (notice.offer.price < 10000 && housingPrice.value === 'low') {
+    if (notice.offer.price < Price.LOW && housingPrice.value === 'low') {
       filtersAmount += 1;
-    } else if (notice.offer.price >= 50000 && housingPrice.value === 'high') {
+    } else if (notice.offer.price >= Price.HIGH && housingPrice.value === 'high') {
       filtersAmount += 1;
-    } else if (notice.offer.price >= 10000 && notice.offer.price < 50000 && housingPrice.value === 'middle') {
+    } else if (notice.offer.price >= Price.LOW && notice.offer.price < Price.HIGH && housingPrice.value === 'middle') {
       filtersAmount += 1;
     }
 
@@ -187,7 +194,6 @@
 
   var onFilterChange = function () {
     var pins = pinsList.querySelectorAll('.map__pin');
-    var fragment = document.createDocumentFragment();
 
     pins.forEach(function (el) {
       if (!el.classList.contains('map__pin--main')) {
@@ -204,11 +210,7 @@
       return false;
     });
 
-    filtered.slice(0, 5).forEach(function (notice) {
-      fragment.appendChild(window.pin.renderPin(notice));
-    });
-
-    pinsList.appendChild(fragment);
+    placePins(filtered);
   };
 
 

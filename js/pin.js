@@ -13,6 +13,10 @@
     var picture = pin.querySelector('img');
     picture.src = notice.author.avatar;
     picture.alt = 'Метка объявления';
+    pin.addEventListener('click', function (evt) {
+      evt.preventDefault();
+      window.card.renderCard(notice);
+    });
     return pin;
   };
 
