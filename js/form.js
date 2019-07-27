@@ -53,4 +53,38 @@
   };
 
   roomNumber.addEventListener('change', onRoomNumberChange);
+
+  var onFormSubmit = function () {
+    var successFormTemplate = document.querySelector('#success')
+      .content
+      .querySelector('.success');
+    var successForm = successFormTemplate.cloneNode(true);
+    var removeSuccessForm = function () {
+      document.removeEventListener('keydown', onSuccessFormEscPress);
+      document.removeEventListener('mousedown', onSuccessFormClick);
+      window.map.deactivatePage();
+      successForm.parentNode.removeChild(successForm);
+    };
+    var onSuccessFormEscPress = function (evt) {
+      evt.preventDefault();
+      if (evt.keyCode === 27) {
+        removeSuccessForm();
+      }
+    };
+    var onSuccessFormClick = function (evt) {
+      evt.preventDefault();
+      removeSuccessForm();
+    };
+    window.card.removeCard();
+    document.body.insertAdjacentElement('afterbegin', successForm);
+    document.addEventListener('keydown', onSuccessFormEscPress);
+    document.addEventListener('mousedown', onSuccessFormClick);
+  };
+
+  noticeForm.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(noticeForm),
+        onFormSubmit,
+        window.map.onErrorAppearance);
+    evt.preventDefault();
+  });
 })();
