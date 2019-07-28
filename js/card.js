@@ -1,6 +1,5 @@
 'use strict';
 (function () {
-  var ESC_KEYCODE = 27;
   var cardTemplate = document.querySelector('#card')
     .content
     .querySelector('.map__card');
@@ -12,12 +11,13 @@
     var currentCard = map.querySelector('.map__card');
     if (currentCard) {
       document.removeEventListener('keydown', onCardEscPress);
+
       map.removeChild(currentCard);
     }
   };
 
   var onCardEscPress = function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
+    if (evt.keyCode === window.data.ESC_KEY_CODE) {
       removeCard();
     }
   };
@@ -89,6 +89,7 @@
   };
 
   window.card = {
-    renderCard: renderCard
+    renderCard: renderCard,
+    removeCard: removeCard
   };
 })();

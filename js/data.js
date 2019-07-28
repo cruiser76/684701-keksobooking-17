@@ -10,55 +10,17 @@
   var MAIN_PIN_WIDTH = 64;
   var MAIN_PIN_HEIGHT = 82;
   var WINDOW_WIDTH = 1200;
+  var ESC_KEY_CODE = 27;
 
-  var getRandomNumber = function (min, max) {
-    return (Math.random() * (max - min) + min);
-  };
-
-  var offers = [
-    'palace',
-    'flat',
-    'house',
-    'bungalo'
-  ];
-  // временно
-  var makeNotices = function (count) {
-    var noticesList = [];
-    for (var i = 0; i < count; i += 1) {
-      var notice = {};
-
-      notice.author = {
-        avatar: 'img/avatars/user0' + (i + 1) + '.png'
-      };
-
-      notice.offer = {
-        type: offers[Math.floor(getRandomNumber(0, offers.length))],
-        price: Math.round(getRandomNumber(1, 100000)),
-        rooms: Math.round(getRandomNumber(1, 3)),
-        guests: Math.round(getRandomNumber(1, 3)),
-        features: ['dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
-        title: 'Тестовая надпись',
-        photos: ['']
-      };
-
-
-      notice.location = {
-        x: Math.round(getRandomNumber(0, WINDOW_WIDTH - PIN_WIDTH)),
-        y: Math.round(getRandomNumber(MIN_WINDOW_HEIGHT, MAX_WINDOW_HEIGHT - PIN_HEIGHT))
-      };
-      noticesList.push(notice);
-    }
-    return noticesList;
-  };
   window.data = {
-    noticesList: makeNotices, // временно
     PIN_WIDTH: PIN_WIDTH,
     PIN_HEIGHT: PIN_HEIGHT,
     MIN_WINDOW_HEIGHT: MIN_WINDOW_HEIGHT,
     MAX_WINDOW_HEIGHT: MAX_WINDOW_HEIGHT,
     WINDOW_WIDTH: WINDOW_WIDTH,
     MAIN_PIN_WIDTH: MAIN_PIN_WIDTH,
-    MAIN_PIN_HEIGHT: MAIN_PIN_HEIGHT
+    MAIN_PIN_HEIGHT: MAIN_PIN_HEIGHT,
+    ESC_KEY_CODE: ESC_KEY_CODE
   };
 
 })();

@@ -2,7 +2,17 @@
 
 (function () {
   var NOTICES_NUMBER = 5;
-  // var mockNotices = window.data.noticesList(NOTICES_NUMBER);// временно
+
+  var InitialCoordinats = {
+    TOP: 375,
+    LEFT: 570
+  };
+
+  var Price = {
+    LOW: 10000,
+    HIGH: 50000
+  };
+
   var noticesList;
   var map = document.querySelector('.map');
   var noticeForm = document.querySelector('.ad-form');
@@ -10,7 +20,6 @@
   var fieldsets = document.querySelectorAll('fieldset');
   var selects = document.querySelectorAll('select');
   var pinsList = document.querySelector('.map__pins');
-
   var isActive = false;
   var address = document.querySelector('#address');
 
@@ -22,15 +31,34 @@
   var housingGuests = filters.querySelector('#housing-guests');
   var checkBoxList = filters.querySelectorAll('.map__checkbox');
 
-  var Price = {
-    LOW: 10000,
-    HIGH: 50000
-  };
-
   var changeDisable = function (item, status) {
     for (var i = 0; i < item.length; i += 1) {
       item[i].disabled = status;
     }
+  };
+
+  var removePins = function () {
+    var pins = pinsList.querySelectorAll('.map__pin');
+
+    pins.forEach(function (el) {
+      if (!el.classList.contains('map__pin--main')) {
+        el.remove();
+      }
+    });
+  };
+
+  var deactivatePage = function () {
+    isActive = false;
+    changeDisable(fieldsets, true);
+    changeDisable(selects, true);
+    document.querySelector('.ad-form').reset();
+    map.classList.add('map--faded');
+    noticeForm.classList.add('ad-form--disabled');
+    address.value = '' + InitialCoordinats.LEFT + ', ' + InitialCoordinats.TOP;
+    removePins();
+    window.card.removeCard();
+    mainPin.style.left = InitialCoordinats.LEFT + 'px';
+    mainPin.style.top = InitialCoordinats.TOP + 'px';
   };
 
   var placePins = function (pins) {
@@ -48,24 +76,43 @@
       fragment.appendChild(window.pin.renderPin(notice));
       pinsList.appendChild(fragment);
     });
-    window.card.renderCard(notices[0]);
   };
 
   var onErrorAppearance = function (errorMessage) {
     var errorTemplate = document.querySelector('#error')
       .content
       .querySelector('.error');
-    var errorText = errorTemplate.querySelector('.error__message');
+    var errorForm = errorTemplate.cloneNode(true);
+    var errorText = errorForm.querySelector('.error__message');
+    var errorButton = errorForm.querySelector('.error__button');
     errorText.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', errorTemplate);
-  };
 
-  var deactivatePage = function () {
-    isActive = false;
-    changeDisable(fieldsets, true);
-    changeDisable(selects, true);
-    map.classList.add('map--faded');
-    noticeForm.classList.add('ad-form--disabled');
+    var removeErrorForm = function () {
+      document.removeEventListener('keydown', onErrorFormEscPress);
+      document.removeEventListener('mousedown', onErrorFormClick);
+      errorForm.parentNode.removeChild(errorForm);
+      deactivatePage();
+    };
+
+    var onErrorFormEscPress = function (evt) {
+      evt.preventDefault();
+      if (evt.keyCode === window.data.ESC_KEY_CODE) {
+        removeErrorForm();
+      }
+    };
+    var onErrorFormClick = function (evt) {
+      evt.preventDefault();
+      removeErrorForm();
+    };
+
+    var onErrorButtonClick = function (evt) {
+      evt.preventDefault();
+      removeErrorForm();
+    };
+    document.addEventListener('keydown', onErrorFormEscPress);
+    document.addEventListener('mousedown', onErrorFormClick);
+    errorButton.addEventListener('click', onErrorButtonClick);
+    document.body.insertAdjacentElement('afterbegin', errorForm);
   };
 
   deactivatePage();
@@ -77,14 +124,7 @@
     changeDisable(selects, false);
     map.classList.remove('map--faded');
     noticeForm.classList.remove('ad-form--disabled');
-
-    // временно
-    // placePins(mockNotices);
-
-    // window.card.renderCard(mockNotices[0]);
   };
-
-  address.value = '' + parseInt(mainPin.style.left, 10) + ',' + parseInt(mainPin.style.top, 10);
 
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
@@ -192,14 +232,9 @@
     return totalFilters;
   };
 
-  var onFilterChange = function () {
-    var pins = pinsList.querySelectorAll('.map__pin');
-
-    pins.forEach(function (el) {
-      if (!el.classList.contains('map__pin--main')) {
-        el.remove();
-      }
-    });
+  var onFilterChange = window.debounce(function () {
+    window.card.removeCard();
+    removePins();
     var amountFormFilters = getAmountFormFilters();
 
     // выбираем объявления которые совпадают по количеству фильтров с количеством фильтров на форме
@@ -211,7 +246,7 @@
     });
 
     placePins(filtered);
-  };
+  });
 
 
   filtersList.forEach(function () {
@@ -220,4 +255,9 @@
   checkBoxList.forEach(function () {
     addEventListener('change', onFilterChange);
   });
+
+  window.map = {
+    onErrorAppearance: onErrorAppearance,
+    deactivatePage: deactivatePage
+  };
 })();
