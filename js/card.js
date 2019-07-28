@@ -11,6 +11,7 @@
     var currentCard = map.querySelector('.map__card');
     if (currentCard) {
       document.removeEventListener('keydown', onCardEscPress);
+
       map.removeChild(currentCard);
     }
   };

@@ -2,10 +2,17 @@
 
 (function () {
   var NOTICES_NUMBER = 5;
+
   var InitialCoordinats = {
     TOP: 375,
     LEFT: 570
   };
+
+  var Price = {
+    LOW: 10000,
+    HIGH: 50000
+  };
+
   var noticesList;
   var map = document.querySelector('.map');
   var noticeForm = document.querySelector('.ad-form');
@@ -23,11 +30,6 @@
   var housingRooms = filters.querySelector('#housing-rooms');
   var housingGuests = filters.querySelector('#housing-guests');
   var checkBoxList = filters.querySelectorAll('.map__checkbox');
-
-  var Price = {
-    LOW: 10000,
-    HIGH: 50000
-  };
 
   var changeDisable = function (item, status) {
     for (var i = 0; i < item.length; i += 1) {
@@ -231,6 +233,7 @@
   };
 
   var onFilterChange = window.debounce(function () {
+    window.card.removeCard();
     removePins();
     var amountFormFilters = getAmountFormFilters();
 

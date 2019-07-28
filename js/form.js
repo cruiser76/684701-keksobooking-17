@@ -15,6 +15,7 @@
   var timeout = noticeForm.querySelector('#timeout');
   var capacity = noticeForm.querySelector('#capacity');
   var roomNumber = noticeForm.querySelector('#room_number');
+  var resetButton = noticeForm.querySelector('.ad-form__reset');
 
   var changeMinPrice = function (houseType) {
     priceField.min = MinPrice[houseType.toUpperCase()];
@@ -86,5 +87,10 @@
         onFormSubmit,
         window.map.onErrorAppearance);
     evt.preventDefault();
+  });
+
+  resetButton.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    window.map.deactivatePage();
   });
 })();

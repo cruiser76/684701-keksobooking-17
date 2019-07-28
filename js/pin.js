@@ -15,6 +15,10 @@
     picture.alt = 'Метка объявления';
     pin.addEventListener('click', function (evt) {
       evt.preventDefault();
+      if (document.querySelector('.map__pin--active')) {
+        document.querySelector('.map__pin--active').classList.remove('map__pin--active');
+      }
+      pin.classList.add('map__pin--active');
       window.card.renderCard(notice);
     });
     return pin;
