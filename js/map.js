@@ -61,21 +61,19 @@
     mainPin.style.top = InitialCoordinats.TOP + 'px';
   };
 
-  var placePins = function (pins) {
+  var placePins = function (notices) {
     var fragment = document.createDocumentFragment();
-    pins.slice(0, NOTICES_NUMBER).forEach(function (notice) {
-      fragment.appendChild(window.pin.renderPin(notice));
+    notices.slice(0, NOTICES_NUMBER).forEach(function (notice) {
+      if (notice.offer) {
+        fragment.appendChild(window.pin.renderPin(notice));
+      }
     });
     pinsList.appendChild(fragment);
   };
 
   var onDataLoad = function (notices) {
     noticesList = notices;
-    notices.slice(0, NOTICES_NUMBER).forEach(function (notice) {
-      var fragment = document.createDocumentFragment();
-      fragment.appendChild(window.pin.renderPin(notice));
-      pinsList.appendChild(fragment);
-    });
+    placePins(notices);
   };
 
   var onErrorAppearance = function (errorMessage) {
@@ -120,10 +118,10 @@
   var activatePage = function () {
     isActive = true;
     window.backend.load(onDataLoad, onErrorAppearance);
-    changeDisable(fieldsets, false);
-    changeDisable(selects, false);
     map.classList.remove('map--faded');
     noticeForm.classList.remove('ad-form--disabled');
+    changeDisable(fieldsets, false);
+    changeDisable(selects, false);
   };
 
   mainPin.addEventListener('mousedown', function (evt) {
@@ -238,14 +236,14 @@
     var amountFormFilters = getAmountFormFilters();
 
     // выбираем объявления которые совпадают по количеству фильтров с количеством фильтров на форме
-    var filtered = noticesList.filter(function (notice) {
+    var filteredNotices = noticesList.filter(function (notice) {
       if (amountFormFilters === getNumberNoticeFilter(notice)) {
         return true;
       }
       return false;
     });
 
-    placePins(filtered);
+    placePins(filteredNotices);
   });
 
 
